@@ -12,23 +12,23 @@ import javax.inject.Inject
 
 @Service
 class AchievementsInteractor @Inject constructor(val repo: IPlayerAchievements): IAchievementsInteractor {
-    override fun earnedAchievements(userId: String, appId: String): List<CivAchievement> {
-        val earnedCheevos = repo.getPlayerAchievments(userId, appId).filter {
+    override fun earnedAchievements(userId: String, appId: String, steamKey: String): List<CivAchievement> {
+        val earnedCheevos = repo.getPlayerAchievments(userId, appId, steamKey).filter {
             it.achieved == 1
         }
-        return getAchievements(earnedCheevos, appId)
+        return getAchievements(earnedCheevos, appId, steamKey)
     }
 
-    override fun lockedAchievements(userId: String, appId: String): List<CivAchievement> {
-        val lockedCheevos = repo.getPlayerAchievments(userId, appId).filter {
+    override fun lockedAchievements(userId: String, appId: String, steamKey: String): List<CivAchievement> {
+        val lockedCheevos = repo.getPlayerAchievments(userId, appId, steamKey).filter {
             it.achieved == 0
         }
-        return getAchievements(lockedCheevos, appId)
+        return getAchievements(lockedCheevos, appId, steamKey)
     }
 
-    override fun suggestedAchievements(userId: String, appId: String): List<CivAchievement> {
-        val cheevos = lockedAchievements(userId, appId)
-        val earnedCheevos = earnedAchievements(userId, appId)
+    override fun suggestedAchievements(userId: String, appId: String, steamKey: String): List<CivAchievement> {
+        val cheevos = lockedAchievements(userId, appId, steamKey)
+        val earnedCheevos = earnedAchievements(userId, appId, steamKey)
         val leaderCheevos = cheevos.filter { it.achievementType == AchievementType.LEADER }
         val difficultyCheevos = cheevos.filter { it.achievementType == AchievementType.DIFFICULTY }
         val victoryCheevos = cheevos.filter { it.achievementType == AchievementType.VICTORY }
@@ -55,8 +55,8 @@ class AchievementsInteractor @Inject constructor(val repo: IPlayerAchievements):
         return listOf(suggestedDifficulty!!, suggestedLeader!!, suggestedVictory!!)
     }
 
-    private fun getAchievements(cheevos: List<SteamPlayerAchievement>, appId: String): List<CivAchievement> {
-        val cheevoDetails = repo.getGameAchievements(appId)
+    private fun getAchievements(cheevos: List<SteamPlayerAchievement>, appId: String, steamKey: String): List<CivAchievement> {
+        val cheevoDetails = repo.getGameAchievements(appId, steamKey)
         return cheevos.map { playerCheevo ->
             val gameCheevo = cheevoDetails.find { it.name == playerCheevo.apiName}
             if (gameCheevo != null) {

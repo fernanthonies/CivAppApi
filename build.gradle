@@ -47,6 +47,7 @@ dependencies {
 
 	compile 'com.google.dagger:dagger:2.16'
 	kapt 'com.google.dagger:dagger-compiler:2.16'
+	kapt 'org.springframework.boot:spring-boot-configuration-processor'
 
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

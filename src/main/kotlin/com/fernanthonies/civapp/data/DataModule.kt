@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class DataModule {
     @Provides
     @Singleton
-    fun provideAchievementRepo(): IPlayerAchievements {
-        return PlayerAchievementsRepository()
+    fun provideAchievementRepo(cheevoRepository: PlayerAchievementsRepository): IPlayerAchievements {
+        return cheevoRepository
     }
 }
