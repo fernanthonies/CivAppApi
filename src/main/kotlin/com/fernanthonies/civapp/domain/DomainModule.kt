@@ -11,4 +11,10 @@ class DomainModule {
     fun provideAchievementInteractor(achievementsInteractor: AchievementsInteractor): IAchievementsInteractor {
         return achievementsInteractor
     }
+
+    @Provides
+    @Singleton
+    fun provideUserInteractor(userInteractor: UserInteractor): IUserInteractor {
+        return userInteractor
+    }
 }
