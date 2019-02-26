@@ -12,6 +12,9 @@ buildscript {
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
+		// using Gradle you need to add a new docker plugin like this:
+		classpath('se.transmode.gradle:gradle-docker:1.2')
 	}
 }
 
@@ -21,6 +24,8 @@ apply plugin: 'kotlin-jpa'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'war'
+apply plugin: 'docker'
 
 group = 'com.fernanthonies.civapp'
 version = '0.0.1-SNAPSHOT'
@@ -64,5 +69,17 @@ compileTestKotlin {
 	kotlinOptions {
 		freeCompilerArgs = ['-Xjsr305=strict']
 		jvmTarget = '1.8'
+	}
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+	push = true
+	applicationName = bootJar.baseName
+	dockerfile = file('Dockerfile')
+	doFirst {
+		copy {
+			from jar
+			into stageDir
+		}
 	}
 }

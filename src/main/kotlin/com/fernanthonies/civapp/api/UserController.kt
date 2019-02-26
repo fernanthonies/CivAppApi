@@ -2,6 +2,7 @@ package com.fernanthonies.civapp.api
 
 import com.fernanthonies.civapp.Components.DaggerServiceComponent
 import com.fernanthonies.civapp.Properties.ApplicationProperties
+import com.fernanthonies.civapp.data.User
 import com.fernanthonies.civapp.domain.Exceptions.UserNotFoundException
 import com.fernanthonies.civapp.domain.IUserInteractor
 import org.springframework.http.HttpStatus
@@ -22,7 +23,7 @@ final class UserController(private val properties: ApplicationProperties) {
     }
 
     @GetMapping("/user/{name}/userId")
-    fun userId(@PathVariable("name") userName: String): String {
+    fun userId(@PathVariable("name") userName: String): User {
         try {
             return interactor.getUserId(userName, properties.steamApiKey)
         } catch (ex: UserNotFoundException) {
