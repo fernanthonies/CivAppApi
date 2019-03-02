@@ -32,6 +32,7 @@ class AchievementsInteractor @Inject constructor(val repo: IPlayerAchievements):
         val leaderCheevos = cheevos.filter { it.achievementType == AchievementType.LEADER }
         val difficultyCheevos = cheevos.filter { it.achievementType == AchievementType.DIFFICULTY }
         val victoryCheevos = cheevos.filter { it.achievementType == AchievementType.VICTORY }
+        val mapCheevos = cheevos.filter { it.achievementType == AchievementType.MAP }
         val random = Random()
 
         val suggestedDifficulty: CivAchievement? = if (difficultyCheevos.any()) {
@@ -52,7 +53,13 @@ class AchievementsInteractor @Inject constructor(val repo: IPlayerAchievements):
             earnedCheevos.filter { it.achievementType == AchievementType.LEADER }.random(random)
         }
 
-        return listOf(suggestedDifficulty!!, suggestedLeader!!, suggestedVictory!!)
+        val suggestedMap: CivAchievement? = if (mapCheevos.any()) {
+            mapCheevos.random(random)
+        } else {
+            earnedCheevos.filter { it.achievementType == AchievementType.MAP }.random(random)
+        }
+
+        return listOf(suggestedDifficulty!!, suggestedLeader!!, suggestedVictory!!, suggestedMap!!)
     }
 
     private fun getAchievements(cheevos: List<SteamPlayerAchievement>, appId: String, steamKey: String): List<CivAchievement> {
@@ -61,9 +68,14 @@ class AchievementsInteractor @Inject constructor(val repo: IPlayerAchievements):
             val gameCheevo = cheevoDetails.find { it.name == playerCheevo.apiName}
             if (gameCheevo != null) {
                 val type: AchievementType = when {
-                    Pattern.matches(RegexUtil.DIFFICULTY_REGEX, gameCheevo.description) -> AchievementType.DIFFICULTY
-                    Pattern.matches(RegexUtil.LEADER_REGEX, gameCheevo.description) -> AchievementType.LEADER
-                    Pattern.matches(RegexUtil.VICTORY_REGEX, gameCheevo.description) -> AchievementType.VICTORY
+                    Pattern.matches(RegexUtil.CIV_6_DIFFICULTY_REGEX, gameCheevo.description) ||
+                    Pattern.matches(RegexUtil.CIV_5_DIFFICULTY_REGEX, gameCheevo.description) -> AchievementType.DIFFICULTY
+                    Pattern.matches(RegexUtil.CIV_6_LEADER_REGEX, gameCheevo.description) ||
+                    Pattern.matches(RegexUtil.CIV_5_LEADER_REGEX, gameCheevo.description) -> AchievementType.LEADER
+                    Pattern.matches(RegexUtil.CIV_6_VICTORY_REGEX, gameCheevo.description) ||
+                    Pattern.matches(RegexUtil.CIV_5_VICTORY_REGEX, gameCheevo.description) -> AchievementType.VICTORY
+                    Pattern.matches(RegexUtil.CIV_6_MAP_REGEX, gameCheevo.description) ||
+                    Pattern.matches(RegexUtil.CIV_5_MAP_REGEX, gameCheevo.description) -> AchievementType.MAP
                     else -> AchievementType.OTHER
                 }
                 val url = if (playerCheevo.achieved == 1) gameCheevo.iconUrl else gameCheevo.grayIconUrl
